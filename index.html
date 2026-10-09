@@ -1,12 +1,8 @@
-Il problema per cui i pulsanti in alto a destra non rispondono al tocco è legato alla sovrapposizione dell'estensione del blocco del titolo (`<div>` dell'header) che va a coprire la superficie dei pulsanti, oppure a problemi con l'inizializzazione delle icone **Lucide**.
+Questo succede perché alcuni commenti o etichette sono stati inseriti all'interno dei tag HTML visibili o nella struttura dei testi anziché essere racchiusi esclusivamente nei commenti JavaScript (`// ...`) o HTML (`<!-- ... -->`).
 
-Ecco il codice completo corretto con tre interventi mirati:
+Ecco il file **`index.html`** completamente pulito e privo di qualsiasi commento o testo strutturale visibile nell'interfaccia.
 
-1. Aggiunto `z-10` e gestito il layout flex con `shrink-0` sui pulsanti per garantire che siano sempre sopra gli altri elementi e cliccabili.
-2. Inserito `event.preventDefault()` e `type="button"` sui pulsanti dell'header per evitare comportamenti imprevisti su Safari mobile.
-3. Riscritto il binding delle funzioni JS in modo pulito e robusto.
-
-Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
+Copia e incolla l'intero codice direttamente nel tuo file **`index.html`** su GitHub:
 
 ```html
 <!DOCTYPE html>
@@ -15,18 +11,12 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Posco Losco Waiting List</title>
-  
-  <!-- Favicon & Icona Schermata Home iPhone (PWA) -->
   <link rel="icon" type="image/jpeg" href="logo.jpg">
   <link rel="apple-touch-icon" href="logo.jpg">
-  
-  <!-- Web App PWA Setup -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Posco Losco">
   <meta name="theme-color" content="#0a0a0a">
-  
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -46,10 +36,7 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
       }
     }
   </script>
-  
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
   <style>
     body {
       background-color: #0a0a0a;
@@ -71,12 +58,10 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
 </head>
 <body class="min-h-screen flex flex-col pb-10">
 
-  <!-- HEADER -->
   <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 py-3 flex justify-between items-center gap-2">
     <div class="flex items-center gap-3 min-w-0 flex-1">
-      <!-- Container Logo Quadrato e Centrato -->
       <div class="w-10 h-10 rounded-lg bg-black border border-brand-border p-1 flex items-center justify-center shrink-0 overflow-hidden">
-        <img src="logo.jpg" alt="Posco Losco Logo" class="max-w-full max-h-full object-contain">
+        <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
       </div>
       <div class="truncate">
         <h1 class="text-sm font-extrabold tracking-wider text-white uppercase leading-none truncate">POSCO LOSCO</h1>
@@ -85,7 +70,6 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
       </div>
     </div>
 
-    <!-- Pulsanti Azione (Fix Cliccabilità) -->
     <div class="flex items-center gap-2 shrink-0 z-10">
       <button type="button" id="voice-btn" onclick="startVoiceRecognition(event)" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale">
         <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
@@ -97,16 +81,13 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
     </div>
   </header>
 
-  <!-- CONTENUTO PRINCIPALE -->
   <main class="flex-1 max-w-2xl w-full mx-auto p-4 space-y-4">
 
-    <!-- STATO SINCRO / LOCALE -->
     <div class="flex justify-between items-center text-xs px-1 text-brand-muted">
       <span id="status-indicator">Inizializzazione...</span>
       <span>Priorità: ASAP > Relax</span>
     </div>
 
-    <!-- FILTRI E RICERCA -->
     <div class="flex gap-2">
       <div class="relative flex-1">
         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-brand-muted"></i>
@@ -121,12 +102,8 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
       </select>
     </div>
 
-    <!-- LISTA CLIENTI -->
-    <div id="client-list" class="space-y-3">
-      <!-- Le schede verranno inserite qui dinamicamente -->
-    </div>
+    <div id="client-list" class="space-y-3"></div>
 
-    <!-- STATO VUOTO -->
     <div id="empty-state" class="hidden py-16 text-center space-y-3">
       <i data-lucide="inbox" class="w-12 h-12 mx-auto text-brand-muted stroke-1"></i>
       <p class="text-brand-muted text-sm">Nessun cliente presente in lista d'attesa.</p>
@@ -134,7 +111,6 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
 
   </main>
 
-  <!-- MODALE FORM (NUOVO / MODIFICA) -->
   <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
       
@@ -148,19 +124,16 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
       <form id="client-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
         <input type="hidden" id="field-id">
 
-        <!-- Nome Cliente -->
         <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Nome Cliente *</label>
           <input type="text" id="field-name" required placeholder="Es. Mario Rossi" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
         </div>
 
-        <!-- Contatto (Telefono) -->
         <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Contatto (Telefono) *</label>
           <input type="tel" id="field-contact" required placeholder="Es. +39 333 1234567" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
         </div>
 
-        <!-- Tipo Progetto & Priorità -->
         <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Tipo Progetto & Priorità *</label>
           <select id="field-priority" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
@@ -171,7 +144,6 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
           </select>
         </div>
 
-        <!-- Luogo -->
         <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Luogo *</label>
           <select id="field-location" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
@@ -182,19 +154,16 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
           </select>
         </div>
 
-        <!-- Data Inserimento -->
         <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Data Inserimento *</label>
           <input type="date" id="field-date" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
         </div>
 
-        <!-- Note -->
         <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Note</label>
           <textarea id="field-notes" rows="3" placeholder="Dettagli progetto, zona corpo, orari..." class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white"></textarea>
         </div>
 
-        <!-- Pulsanti Azione -->
         <div class="flex gap-2 pt-2">
           <button type="button" onclick="closeModal()" class="flex-1 py-2.5 rounded-xl border border-brand-border text-brand-muted hover:text-white font-medium text-sm transition-all">Annulla</button>
           <button type="submit" class="flex-1 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 transition-all">Salva Cliente</button>
@@ -204,15 +173,10 @@ Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
     </div>
   </div>
 
-  <!-- FIREBASE SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- LOGICA APPLICAZIONE -->
   <script>
-    // =========================================================================
-    // 1. CONFIGURAZIONE FIREBASE
-    // =========================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyA4wGo1mHsVQzHuOMn5j8caAhVh5f35Ugo",
   authDomain: "poscolosco-waitlist.firebaseapp.com",
@@ -227,7 +191,6 @@ const firebaseConfig = {
     let useLocalStorage = false;
     let clientsData = [];
 
-    // Inizializzazione Firebase o fallback su LocalStorage
     try {
       if (firebaseConfig.apiKey !== "INSERISCI_LA_TUA_API_KEY") {
         firebase.initializeApp(firebaseConfig);
@@ -243,9 +206,6 @@ const firebaseConfig = {
       loadFromLocalStorage();
     }
 
-    // =========================================================================
-    // 2. GESTIONE DATI
-    // =========================================================================
     function initFirebaseListener() {
       db.collection("waiting_list_posco").onSnapshot(snapshot => {
         clientsData = snapshot.docs.map(doc => ({
@@ -305,9 +265,6 @@ const firebaseConfig = {
       }
     }
 
-    // =========================================================================
-    // 3. ORDINAMENTO & RENDERING LISTA
-    // =========================================================================
     const PRIORITY_LABELS = {
       1: { text: 'Continuo – ASAP', badge: 'bg-white text-black font-bold' },
       2: { text: 'Nuovo – ASAP', badge: 'bg-neutral-300 text-black font-medium' },
@@ -410,9 +367,6 @@ const firebaseConfig = {
       if (window.lucide) lucide.createIcons();
     }
 
-    // =========================================================================
-    // 4. MODALE & FORM
-    // =========================================================================
     function openModal(isEdit = false) {
       if (!isEdit) {
         document.getElementById('client-form').reset();
@@ -460,9 +414,6 @@ const firebaseConfig = {
       closeModal();
     }
 
-    // =========================================================================
-    // 5. RICONOSCIMENTO VOCALE
-    // =========================================================================
     function startVoiceRecognition(e) {
       if (e) e.preventDefault();
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -539,9 +490,6 @@ const firebaseConfig = {
       document.getElementById('field-notes').value = "Inserito via voce: " + text;
     }
 
-    // =========================================================================
-    // UTILITIES
-    // =========================================================================
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -558,7 +506,6 @@ const firebaseConfig = {
       return str.replace(/\b\w/g, l => l.toUpperCase());
     }
 
-    // Init icons
     document.addEventListener("DOMContentLoaded", () => {
       if (window.lucide) lucide.createIcons();
     });
