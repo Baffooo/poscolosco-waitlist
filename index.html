@@ -1,3 +1,14 @@
+Il problema per cui i pulsanti in alto a destra non rispondono al tocco è legato alla sovrapposizione dell'estensione del blocco del titolo (`<div>` dell'header) che va a coprire la superficie dei pulsanti, oppure a problemi con l'inizializzazione delle icone **Lucide**.
+
+Ecco il codice completo corretto con tre interventi mirati:
+
+1. Aggiunto `z-10` e gestito il layout flex con `shrink-0` sui pulsanti per garantire che siano sempre sopra gli altri elementi e cliccabili.
+2. Inserito `event.preventDefault()` e `type="button"` sui pulsanti dell'header per evitare comportamenti imprevisti su Safari mobile.
+3. Riscritto il binding delle funzioni JS in modo pulito e robusto.
+
+Sostituisci l'intero contenuto del file **`index.html`** su GitHub con questo:
+
+```html
 <!DOCTYPE html>
 <html lang="it" class="dark">
 <head>
@@ -61,26 +72,27 @@
 <body class="min-h-screen flex flex-col pb-10">
 
   <!-- HEADER -->
-  <header class="sticky top-0 z-30 bg-brand-black/90 backdrop-blur-md border-b border-brand-border px-4 py-3 flex justify-between items-center">
-    <div class="flex items-center gap-3">
+  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 py-3 flex justify-between items-center gap-2">
+    <div class="flex items-center gap-3 min-w-0 flex-1">
       <!-- Container Logo Quadrato e Centrato -->
       <div class="w-10 h-10 rounded-lg bg-black border border-brand-border p-1 flex items-center justify-center shrink-0 overflow-hidden">
         <img src="logo.jpg" alt="Posco Losco Logo" class="max-w-full max-h-full object-contain">
       </div>
-      <div>
-        <!-- Titolo su due righe -->
-        <h1 class="text-sm font-extrabold tracking-wider text-white uppercase leading-none">POSCO LOSCO</h1>
-        <h2 class="text-xs font-bold tracking-widest text-neutral-300 uppercase leading-tight mt-0.5">WAITING LIST</h2>
-        <p class="text-[10px] text-brand-muted font-medium leading-tight mt-0.5">Tattoo Client Priority System</p>
+      <div class="truncate">
+        <h1 class="text-sm font-extrabold tracking-wider text-white uppercase leading-none truncate">POSCO LOSCO</h1>
+        <h2 class="text-xs font-bold tracking-widest text-neutral-300 uppercase leading-tight mt-0.5 truncate">WAITING LIST</h2>
+        <p class="text-[10px] text-brand-muted font-medium leading-tight mt-0.5 truncate">Tattoo Client Priority System</p>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <button id="voice-btn" onclick="startVoiceRecognition()" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative" title="Comando Vocale">
-        <i data-lucide="mic" class="w-5 h-5"></i>
-        <span id="voice-pulse" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
+
+    <!-- Pulsanti Azione (Fix Cliccabilità) -->
+    <div class="flex items-center gap-2 shrink-0 z-10">
+      <button type="button" id="voice-btn" onclick="startVoiceRecognition(event)" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale">
+        <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
+        <span id="voice-pulse" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping pointer-events-none"></span>
       </button>
-      <button onclick="openModal()" class="px-3.5 py-2 rounded-full bg-white text-black font-semibold text-sm hover:bg-neutral-200 transition-all active:scale-95 flex items-center gap-1.5">
-        <i data-lucide="plus" class="w-4 h-4"></i> Nuovo
+      <button type="button" onclick="openModal(false)" class="px-3.5 py-2 rounded-full bg-white text-black font-semibold text-sm hover:bg-neutral-200 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
+        <i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i> Nuovo
       </button>
     </div>
   </header>
@@ -128,8 +140,8 @@
       
       <div class="flex justify-between items-center border-b border-brand-border pb-3">
         <h2 id="modal-title" class="text-lg font-bold text-white uppercase tracking-wider">Nuovo Cliente</h2>
-        <button onclick="closeModal()" class="text-brand-muted hover:text-white p-1">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button type="button" onclick="closeModal()" class="text-brand-muted hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
         </button>
       </div>
 
@@ -199,7 +211,7 @@
   <!-- LOGICA APPLICAZIONE -->
   <script>
     // =========================================================================
-    // 1. CONFIGURAZIONE FIREBASE (Sostituisci i dati con la tua console Firebase)
+    // 1. CONFIGURAZIONE FIREBASE
     // =========================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyA4wGo1mHsVQzHuOMn5j8caAhVh5f35Ugo",
@@ -232,7 +244,7 @@ const firebaseConfig = {
     }
 
     // =========================================================================
-    // 2. GESTIONE DATI (FIREBASE & LOCALSTORAGE)
+    // 2. GESTIONE DATI
     // =========================================================================
     function initFirebaseListener() {
       db.collection("waiting_list_posco").onSnapshot(snapshot => {
@@ -300,4 +312,258 @@ const firebaseConfig = {
       1: { text: 'Continuo – ASAP', badge: 'bg-white text-black font-bold' },
       2: { text: 'Nuovo – ASAP', badge: 'bg-neutral-300 text-black font-medium' },
       3: { text: 'Continuo – Relax', badge: 'bg-neutral-800 text-neutral-300 border border-neutral-700' },
-      4: { text: 'Nuovo –
+      4: { text: 'Nuovo – Relax', badge: 'bg-neutral-900 text-neutral-500 border border-neutral-800' }
+    };
+
+    function renderList() {
+      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+      const locationFilter = document.getElementById('filter-location').value;
+
+      let filtered = clientsData.filter(c => {
+        const matchesSearch = c.name.toLowerCase().includes(searchQuery) || 
+                              (c.notes && c.notes.toLowerCase().includes(searchQuery)) ||
+                              c.contact.includes(searchQuery);
+        const matchesLocation = locationFilter === 'ALL' || c.location === locationFilter;
+        return matchesSearch && matchesLocation;
+      });
+
+      filtered.sort((a, b) => {
+        const pA = parseInt(a.priority);
+        const pB = parseInt(b.priority);
+
+        if (pA !== pB) {
+          return pA - pB;
+        }
+        return new Date(a.date) - new Date(b.date);
+      });
+
+      const listContainer = document.getElementById('client-list');
+      const emptyState = document.getElementById('empty-state');
+
+      listContainer.innerHTML = '';
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      filtered.forEach((client, index) => {
+        const pInfo = PRIORITY_LABELS[client.priority] || PRIORITY_LABELS[4];
+        const cleanPhone = client.contact.replace(/\D/g, '');
+        const waUrl = `https://wa.me/${cleanPhone}`;
+
+        const card = document.createElement('div');
+        card.className = 'bg-brand-card border border-brand-border rounded-xl p-4 space-y-3 transition-all hover:border-neutral-700 relative group';
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-bold text-brand-muted bg-brand-black px-2 py-1 rounded-md border border-brand-border">#${index + 1}</span>
+              <h3 class="font-bold text-white text-base tracking-wide">${escapeHtml(client.name)}</h3>
+            </div>
+            <span class="text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider ${pInfo.badge}">
+              ${pInfo.text}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-400">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="phone" class="w-3.5 h-3.5 text-brand-muted pointer-events-none"></i>
+              <span>${escapeHtml(client.contact)}</span>
+              <a href="${waUrl}" target="_blank" class="ml-1 text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-0.5">
+                [💬 WhatsApp]
+              </a>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-muted pointer-events-none"></i>
+              <span>${escapeHtml(client.location)}</span>
+            </div>
+
+            <div class="flex items-center gap-1.5 sm:col-span-2">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-muted pointer-events-none"></i>
+              <span>Data Inserimento: ${formatDate(client.date)}</span>
+            </div>
+          </div>
+
+          ${client.notes ? `
+            <div class="text-xs text-neutral-300 bg-brand-black/60 border border-brand-border/50 p-2.5 rounded-lg italic">
+              "${escapeHtml(client.notes)}"
+            </div>
+          ` : ''}
+
+          <div class="flex justify-end gap-3 pt-1 border-t border-brand-border/40 text-xs">
+            <button type="button" onclick="editClient('${client.id}')" class="text-neutral-400 hover:text-white flex items-center gap-1 py-1">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5 pointer-events-none"></i> Modifica
+            </button>
+            <button type="button" onclick="deleteClient('${client.id}')" class="text-red-400/80 hover:text-red-400 flex items-center gap-1 py-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i> Elimina
+            </button>
+          </div>
+        `;
+
+        listContainer.appendChild(card);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // =========================================================================
+    // 4. MODALE & FORM
+    // =========================================================================
+    function openModal(isEdit = false) {
+      if (!isEdit) {
+        document.getElementById('client-form').reset();
+        document.getElementById('field-id').value = '';
+        document.getElementById('modal-title').innerText = 'Nuovo Cliente';
+        document.getElementById('field-date').valueAsDate = new Date();
+      }
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function editClient(id) {
+      const client = clientsData.find(c => c.id === id);
+      if (!client) return;
+
+      document.getElementById('field-id').value = client.id;
+      document.getElementById('field-name').value = client.name;
+      document.getElementById('field-contact').value = client.contact;
+      document.getElementById('field-priority').value = client.priority;
+      document.getElementById('field-location').value = client.location;
+      document.getElementById('field-date').value = client.date;
+      document.getElementById('field-notes').value = client.notes || '';
+
+      document.getElementById('modal-title').innerText = 'Modifica Cliente';
+      openModal(true);
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const clientData = {
+        id: document.getElementById('field-id').value || null,
+        name: document.getElementById('field-name').value.trim(),
+        contact: document.getElementById('field-contact').value.trim(),
+        priority: document.getElementById('field-priority').value,
+        location: document.getElementById('field-location').value,
+        date: document.getElementById('field-date').value,
+        notes: document.getElementById('field-notes').value.trim()
+      };
+
+      await saveClient(clientData);
+      closeModal();
+    }
+
+    // =========================================================================
+    // 5. RICONOSCIMENTO VOCALE
+    // =========================================================================
+    function startVoiceRecognition(e) {
+      if (e) e.preventDefault();
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert("Il tuo browser non supporta la dettatura vocale. Usa Safari su iOS o Chrome su Android.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'it-IT';
+      recognition.interimResults = false;
+
+      const pulse = document.getElementById('voice-pulse');
+      pulse.classList.remove('hidden');
+
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        pulse.classList.add('hidden');
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        parseVoiceCommand(transcript);
+      };
+
+      recognition.onerror = function() {
+        pulse.classList.add('hidden');
+        alert("Errore o nessun comando rilevato. Riprova.");
+      };
+
+      recognition.onend = function() {
+        pulse.classList.add('hidden');
+      };
+    }
+
+    function parseVoiceCommand(text) {
+      openModal(false);
+
+      let nameMatch = text.match(/(?:aggiungi|cliente)\s+([a-zàèéìòù\s]+?)(?=\s+(?:per|a|in|nuovo|continuo|telefono|numero|$))/i);
+      if (nameMatch) {
+        document.getElementById('field-name').value = capitalizeWords(nameMatch[1].trim());
+      } else {
+        const words = text.split(' ');
+        if (words.length > 0) document.getElementById('field-name').value = capitalizeWords(words.slice(0, 2).join(' '));
+      }
+
+      if (text.includes('milano')) {
+        document.getElementById('field-location').value = 'Milano City Ink';
+      } else if (text.includes('remember')) {
+        document.getElementById('field-location').value = 'Remember';
+      } else if (text.includes('convention')) {
+        document.getElementById('field-location').value = 'Conventions';
+      } else {
+        document.getElementById('field-location').value = 'The Grind';
+      }
+
+      const isContinuo = text.includes('continuo') || text.includes('proseguire') || text.includes('progetto');
+      const isAsap = text.includes('prima possibile') || text.includes('urgente') || text.includes('subito');
+
+      if (isContinuo && isAsap) {
+        document.getElementById('field-priority').value = '1';
+      } else if (!isContinuo && isAsap) {
+        document.getElementById('field-priority').value = '2';
+      } else if (isContinuo && !isAsap) {
+        document.getElementById('field-priority').value = '3';
+      } else {
+        document.getElementById('field-priority').value = '4';
+      }
+
+      const phoneMatch = text.match(/\d[\d\s]{7,}\d/);
+      if (phoneMatch) {
+        document.getElementById('field-contact').value = phoneMatch[0].replace(/\s+/g, '');
+      }
+
+      document.getElementById('field-notes').value = "Inserito via voce: " + text;
+    }
+
+    // =========================================================================
+    // UTILITIES
+    // =========================================================================
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      return dateStr;
+    }
+
+    function capitalizeWords(str) {
+      return str.replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    // Init icons
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
+
+```
